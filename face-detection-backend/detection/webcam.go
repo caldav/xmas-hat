@@ -170,7 +170,7 @@ func detectFace(cap *opencv.Capture, rootdir string, stop <-chan interface{}) {
 		}
 		cascade.Release()
 		cascade = opencv.LoadHaarClassifierCascade(path.Join(rootdir, "frontfacedetection.xml"))
-		nextFrameSec = time.Now().Add(time.Duration(0 * time.Second))
+		nextFrameSec = time.Now().Add(time.Duration(5 * time.Second))
 	}
 
 }
