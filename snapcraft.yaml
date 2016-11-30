@@ -1,12 +1,8 @@
-name: face-detection-demo
+name: xmas-hat
 version: "1.0"
-summary: Demo for Face Detection statistics
+summary: See yourself with a silly Christmas hat
 description: |
-  This demo shows face detection statics parameterized to take a picture
-  through a webcam every 5 seconds.
-  We can as well toggle some fun mode replacing heads with random distribution
-  logos supporting snap.
-  All stats are reported through a web interface on 8080 port.
+  This snap demonstrates face detection through OpenCV and applies a Christmas hat layer on the head. Results to be seen on port 8080.
 grade: devel
 # AVC apparmor="DENIED" operation="open" profile="snap.face-detection.service" name="/sys/bus/usb/devices/" pid=16707 comm="face-detection-" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
 # kernel: audit: type=1400 audit(1471437969.708:2261): apparmor="DENIED" operation="open" profile="snap.face-detection.service" name="/sys/bus/usb/devices/" pid=16707 comm="face-detection-" requested_mask="r" denied_mask="r" fsuid=0 ouid=0
@@ -41,7 +37,7 @@ parts:
     plugin: bower
     organize:
       '*': 'www/'
-  # workaround:
-  #   plugin: nil
-  #   snap: [lib/, usr/lib]
-  #   stage-packages: [libfreetype6, libpng12-0, zlib1g]
+  workaround:
+    plugin: nil
+    snap: [lib/, usr/lib]
+    stage-packages: [libfreetype6, libpng12-0, zlib1g]
