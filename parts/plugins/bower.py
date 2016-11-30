@@ -51,8 +51,8 @@ class BowerPlugin(dump.DumpPlugin, nodejs.NodePlugin):
         dump.DumpPlugin.build(self)
 
         # Remove bower and npm from final installation
-        for npmdir in ['bin', 'etc', 'include', 'lib', 'share', '.git']:
+        for npmdir in ['bin', 'etc', 'include', 'lib', 'share']:
             shutil.rmtree(os.path.join(self.installdir, npmdir))
-        for npmfile in ['CHANGELOG.md', 'LICENSE', 'README.md', '.gitignore']:
+        for npmfile in ['CHANGELOG.md', 'LICENSE', 'README.md']:
             os.remove(os.path.join(self.installdir, npmfile))
 
