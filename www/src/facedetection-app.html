@@ -1,0 +1,244 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/google-chart/google-chart.html">
+<link rel="import" href="../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../bower_components/paper-toggle-button/paper-toggle-button.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+
+<dom-module id="facedetection-app">
+  <template>
+    <style include="iron-flex iron-flex-alignment">
+      :host {
+        display: block;
+        /* FIXME: it seems that setting --primary-color in app-theme.html doesn't work here, resetting them */
+        --paper-toggle-button-checked-button-color: var(--ubuntu-orange);
+        --paper-toggle-button-checked-ink-color: var(--ubuntu-orange);
+        --paper-toggle-button-checked-bar-color: var(--ubuntu-orange);
+      }
+      .screenshot {
+        display:inline-block;
+        width: 49%;
+      }
+      #mainrow {
+        transition: background-color 1500ms linear;
+      }
+      #mainrow.broken {
+        background-color: red;
+      }
+      google-chart {
+        width: 100%;
+      }
+      paper-toast {
+        --paper-toast-background-color: var(--canonical-aubergine);
+      }
+      paper-toggle-button {
+        margin: 5px;
+      }
+    </style>
+
+    <div>
+      <div class="row row-hero">
+        <template is="dom-if" if="{{!brokenapp}}">
+          <h1>Popularity of the demo:</h1>
+        </template>
+        <template is="dom-if" if="{{brokenapp}}">
+          <h1>New awesome shiny V2 version:</h1>
+        </template>
+      </div>
+      <div class="row">
+        <h2>Last screen capture and face(s) detected:</h2>
+        <img class="screenshot" src$="[[screencaptureurl]]" />
+        <img class="screenshot" src$="[[screendetectedurl]]" />
+      </div>
+      <div class="row">
+        <div class="vertical layout">
+          <paper-toggle-button checked$="{{facedetection}}" disabled$="{{!connected}}" on-change="facedetectiontoggle">Face detection</paper-toggle-button>
+          <paper-toggle-button checked$="{{renderingfunmode}}" disabled$="{{!connected}}" on-change="funmodetoggle">Fun mode</paper-toggle-button>
+          <div>
+            <paper-dropdown-menu label="Active camera" disabled$="{{!connected}}">
+              <paper-listbox class="dropdown-content" attr-for-selected="num" selected="{{activecamera}}"
+                             on-iron-select="_selectedcamerachanged">
+                <template is="dom-repeat" items="[[availablecameras]]">
+                  <paper-item num="[[item]]">Camera [[item]]</paper-item>
+                </template>
+              </paper-listbox>
+            </paper-dropdown-menu>
+          <div>
+          <div class="horizontal layout center-justified">
+            <paper-button id="restartButton" raised disabled$="{{!connected}}" on-tap="quit">Shut down and restart</paper-button>
+          </div>
+        </div>
+      </div>
+      <paper-toast text="Not connected to server" class="fit-bottom" opened$="[[!connected]]" duration="0"></paper-toast>
+    </div>
+  </template>
+
+  <script>
+    Polymer({
+
+      is: 'facedetection-app',
+
+      properties: {
+        brokenapp: {
+          type: String,
+          value: "",
+        },
+        connected: {
+          type: Boolean,
+          value: false,
+        },
+        screencaptureurl: {
+          type: String,
+          value: "/data/screencapture.png?nocache",
+        },
+        screendetectedurl: {
+          type: String,
+          value: "/data/screendetected.png?nocache",
+        },
+        facedetection: {
+          type: Boolean,
+          value: false,
+        },
+        renderingfunmode: {
+          type: Boolean,
+          value: false,
+        },
+        stats: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+        },
+        activecamera: Number,
+        availablecameras: {
+          type: Array,
+          value: function() {
+            return [];
+          },
+        },
+      },
+
+      ready: function() {
+        // connect websocket and different handlers
+        var websocket = new ReconnectingWebSocket('ws://' + window.location.hostname + ':' + window.location.port + '/api');
+        websocket.onopen = this._connected.bind(this);
+        websocket.onclose = this._disconnected.bind(this);
+        websocket.onerror = this._connectionerror.bind(this);
+        websocket.onmessage = this._onmessage.bind(this);
+
+        this.websocket = websocket; // for sending requests
+      },
+
+      facedetectiontoggle: function(e) {
+        var mode = 1;
+        if (!e.target.checked) {
+          mode = 2;
+        }
+        this.websocket.send('{"FaceDetection": ' + mode +'}')
+      },
+
+      funmodetoggle: function(e) {
+        var mode = 1;
+        if (e.target.checked) {
+          mode = 2;
+        }
+        this.websocket.send('{"RenderingMode": ' + mode +'}')
+      },
+
+      quit: function() {
+        this.websocket.send('{"QuitServer": true}');
+      },
+
+      _connected: function() {
+        console.log('websocket connected');
+        this.connected = true;
+      },
+
+      _disconnected: function() {
+        console.log('websocket disconnected');
+        this.connected = false;
+      },
+
+      _connectionerror: function(e) {
+          console.log('Error in websocket: ' + e.data);
+      },
+
+      _getscreenurl: function(screenurl) {
+        var baseurl = screenurl;
+        var index = baseurl.indexOf("?");
+        if (index !== -1) {
+          baseurl = baseurl.slice(0, index);
+        }
+        return baseurl + "?" + new Date().getTime();
+      },
+
+      _selectedcamerachanged: function() {
+        console.log("Selected camera changed");
+        this.websocket.send('{"Camera": ' + this.activecamera +'}');
+      },
+
+      _onmessage: function(e) {
+        console.log('Message received: ' + e.data);
+        var message = JSON.parse(e.data);
+        switch(message.type) {
+          case 'init':
+            var newstats = [];
+            if (message.allstats !== null) {
+              message.allstats.forEach(function(stat) {
+                newstats.push([(new Date(stat.TimeStamp)).getTime(), stat.NumPersons]);
+              });
+            }
+            this.stats = newstats;
+            // we need to make an array copy because it won't redraw with the same reference, even after a manual redraw call
+            // this is needed even at first start, in case of server restart and state changed
+            this.$.mainchart.rows = this.stats.slice();
+
+            if (message.broken) {
+              this.brokenapp = "broken";
+            } else {
+              this.brokenapp = "";
+            }
+            this.screencaptureurl = this._getscreenurl(this.screencaptureurl);
+            this.screendetectedurl = this._getscreenurl(this.screendetectedurl);
+            this.facedetection = message.facedetection;
+            this.renderingfunmode = message.renderingmode == 1;
+            this.activecamera = message.camera;
+            this.availablecameras = message.availablecameras;
+
+            break;
+
+          case 'newstat':
+            var stat = message.newstat;
+            this.push('stats', [(new Date(stat.TimeStamp)).getTime(), stat.NumPersons]);
+            // we need to make an array copy because it won't redraw with the same reference, even after a manual redraw call
+            this.$.mainchart.rows = this.stats.slice();
+
+            if (message.refreshscreenshot) {
+              this.screencaptureurl = this._getscreenurl(this.screencaptureurl);
+            }
+            if (message.refreshdetectscreenshot) {
+              this.screendetectedurl = this._getscreenurl(this.screendetectedurl);
+            }
+
+            break;
+
+          case 'facedetection':
+            this.facedetection = message.facedetection;
+            break;
+
+          case 'renderingmode':
+            this.renderingfunmode = message.renderingmode == 1;
+            break;
+
+          case 'newcameraactivated':
+            this.activecamera = message.camera;
+            break;
+        }
+      },
+
+    });
+  </script>
+</dom-module>
