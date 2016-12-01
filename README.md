@@ -9,7 +9,7 @@ This snap is a _christmas-ified_ version of https://github.com/ubuntu/face-detec
 
 ## Setup your rpi2/3
 
-1. Install [ubuntu core](https://developer.ubuntu.com/en/snappy/) on your Raspberry Pi.
+1. Install [Ubuntu Core](https://developer.ubuntu.com/en/snappy/) on your Raspberry Pi.
 1. Plug a USB webcam into your Raspberry Pi
 1. Install this snap: `snap install xmas-hat --edge --devmode`
 
