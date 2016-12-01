@@ -1,37 +1,45 @@
-# Code and main assets for our face detection demo snap
+# xmas-hat snap
 
-The face detection demo snap enables people to show multiple faces of snaps. It comprehends:
-* a face-detection-service, which can:
-  * toggle on/off face detection (a webcam is required)
-  * collect stats over time and store it in a sqlite database
-  * serve via a webserver (on http://IP:8080) those results in a single page app, with graph history, last webcam screenshot, last image with detected faces circled (note that the html/css/javascript code is in another repo)
-  * use websocket to connect multiple clients, and refresh data to each web page without needing to reload it
-  * enable "fun" mode where detected faces circle are replaced by distribution logo attributed randomly
-* a face-detection-cli tool, which can:
-  * enable/disable face detection webcam (the webserver will still be served though). No new data is collected when face detection is disabled
-  * toggle between normal/fun rendering mode
-  * quit the service
+This snap demonstrates face detection through OpenCV and applies a silly Christmas hat layer on detected faces. Results to be seen on port 8080.
 
-## Update and revert
+![](http://i.imgur.com/5ZbOrYP.png?1)
 
-The application is buggy on purpose with version **2.0**. The data from previous run will be destroyed (and the web page data refresh to reflects this) and it instructs the web page to turn RED.
-This enables to illustrate the `snap revert` functionality where the previous version will be restored (service restarted) as well as previous data which will be repopulated on the web page.
+This snap is a _christmas-ified_ version of https://github.com/ubuntu/face-detection-demo.
 
-## Technical details
 
-### snapcraft.yaml
+## Setup your rpi2/3
 
-A snapcraft.yaml is provided which demonstrates multiple features!
- * building a golang app
- * shipping a service and a cli tool
- * copying local assets
- * referencing other repository (the web code)
- * give some network-related security permission
- * have different security configuration per application
+1. Install [ubuntu core](https://developer.ubuntu.com/en/snappy/) on your Raspberry Pi.
+1. Plug an USB webcam into your Raspberry Pi
+1. Install this snap: `sudo snap install xmas-hat --edge --devmode`
 
-### generated files
 
-This service generates some files available in `$SNAP_DATA` (root project directory if ran from master without this variable set):
- * configuration (saved by the service for persistency over restart) in `settings`
- * sqlite database contentstorage main data in `storage.db`
- * `screencapture.png` and `screendetected.png` for latest captured images.
+## See the results
+
+The webserver in the snap will be launched automatically as a service after install and when your board starts.
+
+You can launch a web browser on the same network and point it to `http://<ip-address-of-the-pi>:8080` to see the output of the face-detection results. A capture is taken from the webcam every 5 seconds and the end picture will only be updated when a face is detected.
+
+### Increasing the capture rate
+
+You can install this snap on any device running Ubuntu Core, and on more powerful devices (like an x86 laptop), you may want to increase the frequency of webcam captures.
+
+To do so, simply tweak the value of `nextFrameSec` on [this line](https://github.com/caldav/xmas-hat/blob/master/face-detection-backend/detection/webcam.go#L173), for example changing 5 seconds into 1 second, and rebuild the snap by running `snapcraft` on the project directory.
+
+It will create an `xmas-hat_1.0_<arch>.snap` you can install by running:
+
+```bash
+snap install xmas-hat*.snap --devmode
+```
+
+### Disabling the snap
+
+While it can be a fun snap to have installed, you may not want to have your webcam and port 8080 taken by it all the time.
+
+Any snap can be disabled with the `snap disable <snap>` command, stopping any services it runs and effectively making it unavailable to the system:
+
+```
+snap disable xmas-hat
+```
+
+To enable a disabled snap, use `snap enable <snap>`.
