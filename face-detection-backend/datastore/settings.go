@@ -30,7 +30,7 @@ type settingsElem struct {
 
 var (
 	settingsdir   string
-	settings      = settingsElem{false, NORMALRENDERING, 0}
+	settings      = settingsElem{true, FUNRENDERING, 0}
 	filesavemutex = &sync.Mutex{}
 )
 
