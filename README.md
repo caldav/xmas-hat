@@ -10,15 +10,15 @@ This snap is a _christmas-ified_ version of https://github.com/ubuntu/face-detec
 ## Setup your rpi2/3
 
 1. Install [ubuntu core](https://developer.ubuntu.com/en/snappy/) on your Raspberry Pi.
-1. Plug an USB webcam into your Raspberry Pi
-1. Install this snap: `sudo snap install xmas-hat --edge --devmode`
+1. Plug a USB webcam into your Raspberry Pi
+1. Install this snap: `snap install xmas-hat --edge --devmode`
 
 
 ## See the results
 
 The webserver in the snap will be launched automatically as a service after install and when your board starts.
 
-You can launch a web browser on the same network and point it to `http://<ip-address-of-the-pi>:8080` to see the output of the face-detection results. A capture is taken from the webcam every 5 seconds and the end picture will only be updated when a face is detected.
+You can launch a web browser on the same network and point it to `http://<ip-address-of-the-pi>:8080` to see the output of the face detection results. A capture is taken from the webcam every 5 seconds and the end picture will only be updated when a face is detected.
 
 ### Increasing the capture rate
 
@@ -26,7 +26,7 @@ You can install this snap on any device running Ubuntu Core, and on more powerfu
 
 To do so, simply tweak the value of `nextFrameSec` on [this line](https://github.com/caldav/xmas-hat/blob/master/face-detection-backend/detection/webcam.go#L173), for example changing 5 seconds into 1 second, and rebuild the snap by running `snapcraft` on the project directory.
 
-It will create an `xmas-hat_1.0_<arch>.snap` you can install by running:
+It will create an `xmas-hat_1.0_<arch>.snap` that you can install by running:
 
 ```bash
 snap install xmas-hat*.snap --devmode
