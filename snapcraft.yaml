@@ -31,7 +31,7 @@ parts:
   assets-backend:
     source: ./face-detection-backend
     plugin: dump
-    snap: [images, frontfacedetection.xml]
+    snap: [images, frontfacedetection.xml, booth-demo-manager.def]
   website:
     source: ./www
     plugin: bower
