@@ -1,0 +1,4 @@
+xmas-hat:
+  description: "Get yourself on screen with a silly Christmas hat"
+  image: setup/gui/icon.png
+  url: http://localhost:8080
