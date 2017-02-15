@@ -31,12 +31,16 @@ parts:
   assets-backend:
     source: ./face-detection-backend
     plugin: dump
-    snap: [images, frontfacedetection.xml, booth-demo-manager.def]
+    snap: [images, frontfacedetection.xml]
   website:
     source: ./www
     plugin: bower
     organize:
       '*': 'www/'
+  booth-demo-manager:
+    source: .
+    plugin: dump
+    snap: [booth-demo-manager.def]
   workaround:
     plugin: nil
     snap: [lib/, usr/lib]
