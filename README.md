@@ -1,5 +1,7 @@
 # xmas-hat snap
 
+[![Snap Status](https://build.snapcraft.io/badge/caldav/xmas-hat.svg)](https://build.snapcraft.io/user/caldav/xmas-hat)
+
 This snap demonstrates face detection through OpenCV and applies a silly Christmas hat layer on detected faces. Results to be seen on port 8080.
 
 ![](http://i.imgur.com/5ZbOrYP.png?1)
